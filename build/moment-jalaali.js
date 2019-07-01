@@ -79,6 +79,11 @@ module.exports =
   Converts a Gregorian date to Jalaali.
 */
 function toJalaali(gy, gm, gd) {
+  if (Object.prototype.toString.call(gy) === '[object Date]') {
+    gd = gy.getDate()
+    gm = gy.getMonth() + 1
+    gy = gy.getFullYear()
+  }
   return d2j(g2d(gy, gm, gd))
 }
 
@@ -506,35 +511,35 @@ function getPrototypeOf(object) {
     Languages
 ************************************/
 extend(getPrototypeOf(moment.localeData()),
-  { _jMonths: [ 'Farvardin'
-              , 'Ordibehesht'
-              , 'Khordaad'
-              , 'Tir'
-              , 'Amordaad'
-              , 'Shahrivar'
-              , 'Mehr'
-              , 'Aabaan'
-              , 'Aazar'
-              , 'Dey'
-              , 'Bahman'
-              , 'Esfand'
+  { _jMonths: [ 'فروردین'
+              , 'اردیبهشت'
+              , 'خرداد'
+              , 'تیر'
+              , 'مرداد'
+              , 'شهریور'
+              , 'مهر'
+              , 'آبان'
+              , 'آذر'
+              , 'دی'
+              , 'بهمن'
+              , 'اسفند'
               ]
   , jMonths: function (m) {
       return this._jMonths[m.jMonth()]
     }
 
-  , _jMonthsShort:  [ 'Far'
-                    , 'Ord'
-                    , 'Kho'
-                    , 'Tir'
-                    , 'Amo'
-                    , 'Sha'
-                    , 'Meh'
-                    , 'Aab'
-                    , 'Aaz'
-                    , 'Dey'
-                    , 'Bah'
-                    , 'Esf'
+  , _jMonthsShort:  [ 'فروردین'
+                      , 'اردیبهشت'
+                      , 'خرداد'
+                      , 'تیر'
+                      , 'مرداد'
+                      , 'شهریور'
+                      , 'مهر'
+                      , 'آبان'
+                      , 'آذر'
+                      , 'دی'
+                      , 'بهمن'
+                      , 'اسفند'
                     ]
   , jMonthsShort: function (m) {
       return this._jMonthsShort[m.jMonth()]
@@ -821,7 +826,6 @@ function jWeekOfYear(mom, firstDayOfWeek, firstDayOfWeekOfYear) {
 
 function makeMoment(input, format, lang, strict, utc) {
   if (typeof lang === 'boolean') {
-    utc = strict
     strict = lang
     lang = undefined
   }
@@ -863,7 +867,7 @@ function makeMoment(input, format, lang, strict, utc) {
   m._jDiff = config._jDiff || 0
   jm = objectCreate(jMoment.fn)
   extend(jm, m)
-  if (strict && jm.isValid()) {
+  if (strict && format && jm.isValid()) {
     jm._isValid = jm.format(origFormat) === origInput
   }
   return jm
@@ -935,7 +939,7 @@ jMoment.fn.jMonth = function (input) {
     , g
   if (input != null) {
     if (typeof input === 'string') {
-      input = this.lang().jMonthsParse(input)
+      input = this.localeData().jMonthsParse(input)
       if (typeof input !== 'number')
         return this
     }
